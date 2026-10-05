@@ -1,0 +1,27 @@
+{
+  "curso": "Programación I",
+  "fecha": "2026-10-05",
+  "asistencias": [
+    {
+      "id": 1,
+      "nombre": "Ana Pérez",
+      "hora_entrada": "08:00",
+      "hora_salida": "12:00",
+      "estado": "presente"
+    },
+    {
+      "id": 2,
+      "nombre": "Luis Gómez",
+      "hora_entrada": "08:15",
+      "hora_salida": "12:00",
+      "estado": "tarde"
+    },
+    {
+      "id": 3,
+      "nombre": "María López",
+      "hora_entrada": null,
+      "hora_salida": null,
+      "estado": "ausente"
+    }
+  ]
+}
