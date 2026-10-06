@@ -317,7 +317,17 @@ detectó problemas y aplicó correcciones, entre ellas:
 
 ---
 
-## 15. Solución de problemas
+## 15. Evidencia (v1.0)
+
+| Recurso | URL |
+|---|---|
+| Web App publicada (versión 1) | <https://script.google.com/macros/s/AKfycbyTcBOGYUEOK3aqc2A4qn7kDYakado6BOhSf1Q328RmF0_wQbtSHmeChG_K9dkxsGp6/exec> |
+| Google Sheets (`BD_Control_Asistencia`) | <https://docs.google.com/spreadsheets/d/1jCzzUq3IJDb8f_GuAolGuUC1-bAjB7rEkTVVrNzqeS0/edit> (acceso restringido) |
+| Repositorio | <https://github.com/melissaManzano/control-asistencia-apps-script> (etiqueta `v1.0`) |
+
+---
+
+## 16. Solución de problemas
 
 | Síntoma | Causa probable | Solución |
 |---|---|---|
