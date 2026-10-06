@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    /* Estilos base: teléfono. Las pantallas grandes se ajustan al final. */
+    .contenedor {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 10px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .curso {
+      margin: 0 0 2px;
+      color: #6b7280;
+      font-size: .85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+    }
+
+    .subtitulo {
+      margin: 0;
+      color: #6b7280;
+    }
+
+    .etiqueta {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    select, button {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    select {
+      border: 1px solid #d1d5db;
+      padding: 10px;
+      background: white;
+    }
+
+    button {
+      border: 0;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-secundario {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-principal {
+      background: #111827;
+      color: white;
+      min-height: 54px;
+      font-size: 1.05rem;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: default;
+    }
+
+    .acciones {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .resumen {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    #lista {
+      display: grid;
+      gap: 10px;
+    }
+
+    /* Toda la tarjeta es tocable: es un <label> que contiene la casilla. */
+    .participante {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 64px;
+      padding: 12px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .15s, border-color .15s;
+    }
+
+    .participante.presente {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .nombre {
+      font-weight: 700;
+    }
+
+    .correo {
+      color: #6b7280;
+      font-size: .9rem;
+      overflow-wrap: anywhere;
+    }
+
+    .switch {
+      width: 30px;
+      height: 30px;
+      accent-color: #16a34a;
+      pointer-events: none;
+    }
+
+    /* Barra fija abajo para guardar sin recorrer los 30 participantes. */
+    .barra-guardar {
+      position: sticky;
+      bottom: 0;
+      padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+      background: #f3f4f6;
+    }
+
+    .mensaje {
+      margin-bottom: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .ok {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .cargando {
+      display: none;
+      text-align: center;
+      padding: 12px;
+      color: #4b5563;
+    }
+
+    /* Pantallas más anchas (tablet / escritorio). */
+    @media (min-width: 521px) {
+      .contenedor { padding: 16px; }
+      .panel { padding: 18px; }
+      .acciones { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: 1.45rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="contenedor">
+    <section class="panel">
+      <p class="curso">Inteligencia Artificial aplicacada a las TIC</p>
+      <h1>Control de asistencia</h1>
+      <p class="subtitulo">30 participantes · 10 sesiones</p>
+    </section>
+
+    <section class="panel">
+      <label class="etiqueta" for="sesion">Sesión</label>
+      <select id="sesion">
+        <option value="">Selecciona una sesión</option>
+      </select>
+
+      <div class="acciones">
+        <button class="btn-secundario" onclick="marcarTodos(true)">
+          Marcar todos
+        </button>
+        <button class="btn-secundario" onclick="marcarTodos(false)">
+          Desmarcar todos
+        </button>
+      </div>
+
+      <div class="resumen">
+        <span id="contador">Presentes: 0 / 0</span>
+        <span id="estadoSesion"></span>
+      </div>
+    </section>
+
+    <section>
+      <div id="cargando" class="cargando">Cargando...</div>
+      <div id="lista"></div>
+    </section>
+
+    <div class="barra-guardar">
+      <div id="mensaje" class="mensaje" role="status"></div>
+      <button id="guardar" class="btn-principal" onclick="guardar()" disabled>
+        Guardar asistencia
+      </button>
+    </div>
+  </main>
+
+  <script>
+    let participantes = [];
+    let sesiones = [];
+
+    document.addEventListener('DOMContentLoaded', cargarSesiones);
+    document.getElementById('sesion').addEventListener('change', cargarParticipantes);
+
+    function cargarSesiones() {
+      mostrarCarga(true);
+
+      google.script.run
+        .withSuccessHandler(datos => {
+          sesiones = datos || [];
+          const select = document.getElementById('sesion');
+
+          sesiones.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.id;
+            option.textContent =
+              `Sesión ${s.numero} - ${s.fecha || 'sin fecha'} - ${s.tema}`;
+            select.appendChild(option);
+          });
+
+          mostrarCarga(false);
+        })
+        .withFailureHandler(mostrarError)
+        .obtenerSesiones();
+    }
+
+    function cargarParticipantes() {
+      const idSesion = document.getElementById('sesion').value;
+      document.getElementById('lista').innerHTML = '';
+      document.getElementById('guardar').disabled = true;
+      limpiarMensaje();
+
+      if (!idSesion) {
+        participantes = [];
+        actualizarContador();
+        document.getElementById('estadoSesion').textContent = '';
+        mostrarCarga(false);
+        return;
+      }
+
+      const sesion = sesiones.find(s => s.id === idSesion);
+      document.getElementById('estadoSesion').textContent =
+        sesion ? sesion.estado : '';
+
+      mostrarCarga(true);
+
+      google.script.run
+        .withSuccessHandler(datos => {
+          // Ignora respuestas de una sesión que ya no está seleccionada.
+          if (document.getElementById('sesion').value !== idSesion) return;
+
+          participantes = datos || [];
+          renderParticipantes();
+          mostrarCarga(false);
+          document.getElementById('guardar').disabled = false;
+        })
+        .withFailureHandler(error => {
+          if (document.getElementById('sesion').value !== idSesion) return;
+          mostrarError(error);
+        })
+        .obtenerParticipantes(idSesion);
+    }
+
+    function renderParticipantes() {
+      const lista = document.getElementById('lista');
+      lista.innerHTML = '';
+
+      participantes.forEach((p, indice) => {
+        const fila = document.createElement('label');
+        fila.className = 'participante';
+        fila.classList.toggle('presente', Boolean(p.presente));
+
+        const datos = document.createElement('div');
+        datos.innerHTML = `
+          <div class="nombre">${escapar(p.id)} · ${escapar(p.nombre)}</div>
+          <div class="correo">${escapar(p.correo)}</div>
+        `;
+
+        const check = document.createElement('input');
+        check.type = 'checkbox';
+        check.className = 'switch';
+        check.checked = Boolean(p.presente);
+        check.addEventListener('change', () => {
+          participantes[indice].presente = check.checked;
+          fila.classList.toggle('presente', check.checked);
+          actualizarContador();
+        });
+
+        fila.appendChild(datos);
+        fila.appendChild(check);
+        lista.appendChild(fila);
+      });
+
+      actualizarContador();
+    }
+
+    function marcarTodos(valor) {
+      participantes = participantes.map(p => ({
+        ...p,
+        presente: valor
+      }));
+      renderParticipantes();
+    }
+
+    function actualizarContador() {
+      const presentes = participantes.filter(p => p.presente).length;
+      document.getElementById('contador').textContent =
+        `Presentes: ${presentes} / ${participantes.length}`;
+    }
+
+    function guardar() {
+      const idSesion = document.getElementById('sesion').value;
+
+      if (!idSesion) {
+        mostrarMensaje('Selecciona una sesión.', false);
+        return;
+      }
+
+      // El indicador "Cargando..." queda arriba de la lista; mientras se guarda,
+      // el aviso visible es el propio botón fijo de abajo.
+      const boton = document.getElementById('guardar');
+      boton.disabled = true;
+      boton.textContent = 'Guardando...';
+      limpiarMensaje();
+
+      google.script.run
+        .withSuccessHandler(resultado => {
+          terminarGuardado();
+
+          mostrarMensaje(
+            `Guardado: ${resultado.presentes} presentes y ` +
+            `${resultado.ausentes} ausentes.`,
+            true
+          );
+
+          const sesion = sesiones.find(s => s.id === idSesion);
+          if (sesion) {
+            sesion.estado = 'REGISTRADA';
+            if (document.getElementById('sesion').value === idSesion) {
+              document.getElementById('estadoSesion').textContent = 'REGISTRADA';
+            }
+          }
+        })
+        .withFailureHandler(error => {
+          terminarGuardado();
+          mostrarError(error);
+        })
+        .guardarAsistencia(idSesion, participantes);
+    }
+
+    function terminarGuardado() {
+      const boton = document.getElementById('guardar');
+      boton.textContent = 'Guardar asistencia';
+      boton.disabled = !document.getElementById('sesion').value;
+    }
+
+    function limpiarMensaje() {
+      const mensaje = document.getElementById('mensaje');
+      mensaje.textContent = '';
+      mensaje.className = 'mensaje';
+    }
+
+    function mostrarCarga(visible) {
+      document.getElementById('cargando').style.display =
+        visible ? 'block' : 'none';
+    }
+
+    function mostrarError(error) {
+      mostrarCarga(false);
+      const texto = error && error.message
+        ? error.message
+        : String(error);
+      mostrarMensaje(texto, false);
+    }
+
+    function mostrarMensaje(texto, correcto) {
+      const mensaje = document.getElementById('mensaje');
+      mensaje.textContent = texto;
+      mensaje.className = `mensaje ${correcto ? 'ok' : 'error'}`;
+    }
+
+    function escapar(texto) {
+      return String(texto ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+  </script>
+</body>
+</html>
